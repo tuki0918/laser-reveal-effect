@@ -1,36 +1,62 @@
-import type * as React from "react";
+import type React from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from "react";
+import type { LaserOptions } from "./engine";
+import { useLaserEffect } from "./useLaserEffect";
 
-export type LaserCanvasProps = {
-  /** wrapper(div) に付けるクラス */
-  className?: string;
-  /** canvas に付けるクラス */
-  canvasClassName?: string;
+export type LaserCanvasHandle = {
+  start: () => void;
+  pause: () => void;
+  reset: () => void;
+  draw: () => void;
+  setOptions: (next: Partial<LaserOptions>) => void;
+  setImage: (next: CanvasImageSource) => void;
+};
 
-  intensity?: number;
-  dimBackground?: boolean;
-} & Omit<React.CanvasHTMLAttributes<HTMLCanvasElement>, "className">;
+export type LaserCanvasOptions = LaserOptions;
 
-export function LaserCanvas({
-  className = "",
-  canvasClassName = "",
-  intensity = 1,
-  dimBackground = true,
-  ...canvasProps
-}: LaserCanvasProps) {
-  // TODO: canvasProps / intensity / dimBackground を使って描画ロジックを書く
+export type LaserCanvasProps = Omit<
+  React.CanvasHTMLAttributes<HTMLCanvasElement>,
+  "children"
+> & {
+  image?: CanvasImageSource | null;
+  imageSrc?: string;
+  options?: Partial<LaserCanvasOptions>;
+  autoStart?: boolean;
+  crossOrigin?: HTMLImageElement["crossOrigin"];
+};
 
-  return (
-    <div
-      className={[
-        "relative overflow-hidden rounded-xl",
-        dimBackground ? "bg-black/80" : "bg-transparent",
-        className,
-      ].join(" ")}
-    >
-      <canvas
-        {...canvasProps}
-        className={["block h-full w-full", canvasClassName].join(" ")}
-      />
-    </div>
-  );
-}
+export const LaserCanvas = forwardRef<LaserCanvasHandle, LaserCanvasProps>(
+  function LaserCanvas(
+    { image, imageSrc, options, autoStart = true, crossOrigin, ...rest },
+    ref,
+  ) {
+    const [canvasEl, setCanvasEl] = useState<HTMLCanvasElement | null>(null);
+    const api = useLaserEffect({
+      canvas: canvasEl,
+      image,
+      imageSrc,
+      options,
+      autoStart,
+      crossOrigin,
+    });
+
+    useImperativeHandle(ref, () => api, [api]);
+
+    const canvasRef = useMemo(() => setCanvasEl, []);
+
+    useEffect(() => {
+      if (!canvasEl) return;
+      if (rest.width || rest.height) return;
+      canvasEl.width = 1;
+      canvasEl.height = 1;
+    }, [canvasEl, rest.width, rest.height]);
+
+    return <canvas ref={canvasRef} {...rest} />;
+  },
+);
