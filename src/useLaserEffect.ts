@@ -23,12 +23,14 @@ export function useLaserEffect({
   crossOrigin = "anonymous",
 }: UseLaserEffectParams) {
   const engineRef = useRef<LaserEngine | null>(null);
+  const optionsRef = useRef<Partial<LaserOptions> | undefined>(options);
   const lastOptionsRef = useRef<Partial<LaserOptions> | undefined>(options);
+  optionsRef.current = options;
 
   useEffect(() => {
     if (!canvas) return;
     if (!engineRef.current) {
-      engineRef.current = createLaserEngine(canvas, options);
+      engineRef.current = createLaserEngine(canvas, optionsRef.current);
     }
     return () => {
       engineRef.current?.destroy();
@@ -45,7 +47,7 @@ export function useLaserEffect({
   }, [options]);
 
   useEffect(() => {
-    if (!engineRef.current || !image) return;
+    if (!canvas || !engineRef.current || !image) return;
     engineRef.current.setImage(image);
     if (autoStart) {
       engineRef.current.start();
@@ -53,7 +55,7 @@ export function useLaserEffect({
   }, [image, autoStart, canvas]);
 
   useEffect(() => {
-    if (!engineRef.current || !imageSrc) return;
+    if (!canvas || !engineRef.current || !imageSrc) return;
     const img = new Image();
     img.crossOrigin = crossOrigin;
     img.onload = () => {
