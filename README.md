@@ -35,11 +35,11 @@ export function Demo() {
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `laserSize` | `number` | `16` | レーザーのサイズ（px） |
-| `laserEnabled` | `boolean` | `true` | レーザー描画の有効/無効 |
-| `backgroundColor` | `string` | `transparent` | 背景色 |
-| `durationMs` | `number` | `6000` | 完了までの時間（ms） |
-| `orderMode` | `ltr \| rtl \| zigzag \| random` | `ltr` | 復元順序（`ltr`: 左→右、`rtl`: 右→左、`zigzag`: 行ごとに左右交互、`random`: ランダム） |
+| `laserSize` | `number` | `16` | Laser size (px) |
+| `laserEnabled` | `boolean` | `true` | Enable/disable laser drawing |
+| `backgroundColor` | `string` | `transparent` | Background color |
+| `durationMs` | `number` | `6000` | Time to completion (ms) |
+| `orderMode` | `ltr \| rtl \| zigzag \| random` | `ltr` | Restore order (`ltr`: left to right, `rtl`: right to left, `zigzag`: alternate left/right per row, `random`: random) |
 
 ## Examples
 
